@@ -21,10 +21,18 @@ if not exist "C:\Windows\Temp\sdelete.exe" (
 
 msiexec /qb /x C:\Windows\Temp\7z920-x64.msi
 
+REM determine if Windows Updates are running
+set isrunning=0
+sc query wuauserv | find "RUNNING">nul && set isrunning=1
+
 net stop wuauserv
 rmdir /S /Q C:\Windows\SoftwareDistribution\Download
 mkdir C:\Windows\SoftwareDistribution\Download
-net start wuauserv
+
+REM restart Windows Updater if it was running before
+if isrunning == 1 (
+	net start wuauserv
+)
 
 cmd /c C:\Windows\Temp\ultradefrag-portable-6.1.0.amd64\udefrag.exe --optimize --repeat C:
 
